@@ -15,6 +15,10 @@ $ npm install -g ew-meetup-generator
 
 ```node ./bin/ew-meetup-generator --help```
 
+e.g. Meetups for the last 14 days:
+
+```node ./bin/ew-meetup-generator -d 14````
+
 # License
 
 Copyright (c) 2013 
