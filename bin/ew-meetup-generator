@@ -1,0 +1,204 @@
+#!/usr/bin/env node
+'use strict';
+
+
+//This is terrible (terrible!!) code - DON'T LOOK!
+
+var program  = require('commander'),
+	yaml = require('js-yaml'),
+	fs   = require('fs'),
+	moment = require('moment'),
+	RSVP = require('rsvp'),
+	request = require('request'),
+	_s = require('underscore.string'),
+	_ = require('lodash'),
+	nconf = require('nconf');
+
+
+var GITHUB_MEETUP_YAML = 'https://raw.github.com/emberjs/website/master/data/meetups.yml';
+  
+program
+  .version('0.0.1')
+  .option('-l, --local', 'read local meetups.yml', false)
+  .option('-o, --overwrite', 'overwrite local meetups.yml with remote', false)
+  .option('-s, --start <days>', 'start days from now', 0)
+  .option('-d, --days <days>', 'number of days to include', 10)
+  .option('-p, --path <path>', 'path to the source yaml file', GITHUB_MEETUP_YAML)
+  .parse(process.argv);
+
+console.log(' - local %j', program.local);
+console.log(' - overwrite %j', program.overwrite);
+console.log(' - path %j', program.path);
+console.log(' - start %j', program.start);
+
+
+var meetupsYAML;
+var meetupUrls = [];
+var envConfFile = 'env';
+
+nconf.file({ file: envConfFile});
+
+var MY_MEETUP_API_KEY = nconf.get('MEETUP_API_KEY');
+var meetupAPI = require('meetup-api')(MY_MEETUP_API_KEY);
+
+var meetupURL = 'https://raw.github.com/emberjs/website/master/data/meetups.yml';
+var localMeetupFile = 'data/meetups.yml';
+var UPCOMING_DAYS = program.days;
+var DATE_FORMAT = 'Do MMMM, h:mma';
+
+if (program.local){
+	program.path = localMeetupFile;
+}
+
+var getYAML = new RSVP.Promise(function(resolve, reject){
+	var isRemoteFile = _s.startsWith(program.path, 'http');
+
+	if (isRemoteFile){
+		console.log('fetching ' + program.path + '...');
+		var getFile = request.get(program.path, function (error, response, body) {
+		    if (!error && response.statusCode == 200) {
+		         meetupsYAML = yaml.safeLoad(body);
+		         resolve(meetupsYAML);
+		    }else{
+		  		reject(error);
+		    }
+		});
+
+		if (program.overwrite){
+			getFile.pipe(fs.createWriteStream(localMeetupFile));
+		}
+	}else{
+
+	// Get document, or throw exception on error
+		try {
+		  meetupsYAML = yaml.safeLoad(fs.readFileSync(program.path, 'utf8'));
+          resolve(meetupsYAML);
+		} catch (e) {
+		  reject(e);
+		}
+	}
+});
+
+
+
+var now = moment(moment().utc()).unix() * 1000;
+var startDays = parseInt(program.start) * 24 * 60 * 60 * 1000;
+var startDate = now + startDays;
+var upcomingDaysInMs = UPCOMING_DAYS * 24 * 60 * 60 * 1000;
+var endDate = now + upcomingDaysInMs;
+
+console.log('program.start: ' + program.start)
+console.log('endDate: ' + endDate)
+console.log('startDate: ' + startDate)
+var startDateFormatted = moment(startDate).format('Do MMM');
+var endDateFormatted = moment(endDate).format('Do MMM');
+
+getYAML.then(function(data){
+	if (data){
+		// console.log(data);
+		Object.keys(data).forEach(function(key){
+			data[key].forEach(function(meetup){
+				if(meetup.url.indexOf('meetup.com') > -1){
+					meetupUrls.push(meetup.url);
+				}
+			});
+		});
+
+		var upcomingEvents =[];
+		var promises = [];
+
+		console.log('fetching events for ' + meetupUrls.length + ' meetups between ' + startDateFormatted + ' - ' + endDateFormatted + ': \n'); //+ meetupUrls.join('\n'));
+
+		meetupUrls.forEach(function(url){
+			url = url.replace('http://www.meetup.com/', '').replace('/', '');
+
+			var promise = new RSVP.Promise(function(resolve, reject){
+
+				meetupAPI.getEvents({'group_urlname': url, 'status': 'upcoming'}, function(err, events) {
+					// console.log(url + ': searching...');
+
+					if ( !err && events.results){
+						console.log('Found a total of ' + events.results.length + ' events for ' + url);
+
+						events.results.forEach(function(event){
+							var eventDate = event.time + event.utc_offset + (5*60*60*1000);
+							var timeUntilEvent = eventDate - startDate;
+							var isWithinTimeframe = timeUntilEvent < upcomingDaysInMs && timeUntilEvent > 0;
+
+							var eventObj = {
+								name: event.name,
+								venue: event.venue && event.venue.name ? event.venue.name : '',
+								city: event.venue && event.venue.city ? event.venue.city : '',
+								country: event.venue && event.venue.country ? event.venue.country : '',
+								date: moment(eventDate).format(DATE_FORMAT),
+								url: event.event_url,
+								group: event.group && event.group.name ? event.group.name : ''
+							};
+
+							
+
+							if (isWithinTimeframe){
+								upcomingEvents.push(eventObj);
+							}else{
+								// console.log(eventObj.group + ': ' + eventObj.name + ' will be on ' + eventObj.time);
+							}
+						});
+					}
+					resolve();
+				});
+			
+			});
+			promises.push(promise);
+		});
+
+		return RSVP.all(promises).then(function(data){
+			console.log('There are a total of ' + upcomingEvents.length + ' upcoming events.');
+
+			var events = sortEvents(upcomingEvents);
+			var outputYaml = yamlitizeNewsletter(events);
+
+			var date = moment().format('YYYY-MM-DD+' + UPCOMING_DAYS);
+			var filename = 'output/meetups-' + date + '.yaml';
+			fs.writeFile(filename, outputYaml, function(err) {
+			    if(err) {
+			        console.error(err);
+			    } else {
+			        console.log('Saved output at ' + filename);
+			    }
+			}); 
+
+		}, function(error){
+			console.error('error:' + error);
+		});
+
+	}	
+})
+.fail(function(error){
+	console.error(error);
+});
+
+
+function sortEvents(events){
+	return _.sortBy(events, 'date', this);
+}
+
+function yamlitizeNewsletter(events){
+	var newsletterEvents = [];
+	events.forEach(function(eventObj){
+		var eventDescription = eventObj.name ? eventObj.name + '. ' : '';
+			eventDescription += eventObj.date ? eventObj.date : '';
+			eventDescription += eventObj.venue && eventObj.date ? ' @ ' : '';
+			eventDescription += eventObj.venue ? eventObj.venue + ', ' + eventObj.city : '';
+			eventDescription += '.';
+
+		newsletterEvents.push({
+			title: eventObj.group,
+			description: eventDescription,
+			link: eventObj.url
+		});
+	});
+
+	return yaml.safeDump(newsletterEvents, {
+		indent: 4
+	});
+}

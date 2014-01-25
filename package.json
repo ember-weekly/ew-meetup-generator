@@ -1,0 +1,36 @@
+{
+  "name": "ew-meetup-generator",
+  "version": "0.0.0",
+  "description": "A commander CLI app",
+  "private": true,
+  "bin": {
+    "ew-meetup-generator": "./bin/ew-meetup-generator"
+  },
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "author": {
+    "name": "",
+    "email": "",
+    "url": "https://github.com//"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com///ew-meetup-generator"
+  },
+  "license": "MIT",
+  "bugs": "https://github.com///ew-meetup-generator/issues",
+  "dependencies": {
+    "commander": "~2.0.0",
+    "autocmdr": "~0.0.4",
+    "js-yaml": "~3.0.1",
+    "meetup-api": "~0.1.1",
+    "moment": "~2.5.0",
+    "rsvp": "~2.0.4",
+    "request": "~2.30.0",
+    "underscore.string": "~2.3.3",
+    "nconf": "~0.6.9",
+    "lodash": "~2.4.1"
+  },
+  "devDependencies": {}
+}
