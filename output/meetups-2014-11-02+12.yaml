@@ -1,0 +1,48 @@
+- 
+    title: Vancouver
+    description: "11th November, 5:30pm @ Code Core, Vancouver."
+    link: "http://www.meetup.com/Vancouver-Ember-js/events/dbthqkyspbpb/"
+- 
+    title: Atlanta
+    description: "11th November, 6:00pm @ Big Nerd Ranch, Atlanta."
+    link: "http://www.meetup.com/Ember-Atlanta-Meetup/events/215314672/"
+- 
+    title: San Francisco
+    description: "13th November, 5:30pm @ Neo, San Francisco."
+    link: "http://www.meetup.com/Ember-SF/events/201901122/"
+- 
+    title: St. Paul
+    description: "13th November, 6:00pm @ Tightrope Media Systems, St. Paul."
+    link: "http://www.meetup.com/EmberMN/events/215398302/"
+- 
+    title: Montevideo
+    description: "13th November, 6:30pm @ WyeWorks, Montevideo."
+    link: "http://www.meetup.com/ember-montevideo/events/216337432/"
+- 
+    title: Chicago
+    description: "3rd November, 5:00pm @ Groupon - 3rd Floor, Chicago."
+    link: "http://www.meetup.com/Chicago-Ember-js/events/203706052/"
+- 
+    title: Saint Louis
+    description: "3rd November, 5:00pm @ Second Street, Saint Louis."
+    link: "http://www.meetup.com/STLEmber/events/213235952/"
+- 
+    title: Vancouver
+    description: "4th November, 5:30pm @ Code Core, Vancouver."
+    link: "http://www.meetup.com/Vancouver-Ember-js/events/216498692/"
+- 
+    title: Seattle
+    description: "5th November, 5:30pm @ Classmates Online, Seattle."
+    link: "http://www.meetup.com/Ember-js-Seattle-Meetup/events/213238482/"
+- 
+    title: Ottawa
+    description: "5th November, 5:30pm @ bv02, Ottawa."
+    link: "http://www.meetup.com/Ember-js-Ottawa/events/209849552/"
+- 
+    title: New York
+    description: "5th November, 6:00pm @ SimpleReach, New York."
+    link: "http://www.meetup.com/EmberJS-NYC/events/215889732/"
+- 
+    title: Toronto
+    description: "6th November, 5:30pm @ Pharmacy Bar, Toronto."
+    link: "http://www.meetup.com/Toronto-Ember-JS-Meetup/events/216137752/"

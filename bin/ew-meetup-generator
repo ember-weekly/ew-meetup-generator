@@ -2,7 +2,7 @@
 'use strict';
 
 
-//This is terrible (terrible!!) code - DON'T LOOK!
+//This is terrible (terrible!!) code - DON'T LOOK! It needs a total re-write! It's terrible!
 
 var program  = require('commander'),
 	yaml = require('js-yaml'),
@@ -14,9 +14,11 @@ var program  = require('commander'),
 	_ = require('lodash'),
 	nconf = require('nconf');
 
+//FIXME: URGH - hacky, when the clocks change (or it runs from different timezone) this breaks :|
+var TIMEZONE_OFFSET = 5 * (60*60*1000); // hrs * mins * sec * ms
 
 var GITHUB_MEETUP_YAML = 'https://raw.github.com/emberjs/website/master/data/meetups.yml';
-  
+
 program
   .version('0.0.1')
   .option('-l, --local', 'read local meetups.yml', false)
@@ -47,6 +49,7 @@ var UPCOMING_DAYS = program.days;
 var DATE_FORMAT = 'Do MMMM, h:mma';
 
 if (program.local){
+	console.info('Reading from local file ', localMeetupFile);
 	program.path = localMeetupFile;
 }
 
@@ -87,19 +90,25 @@ var startDate = now + startDays;
 var upcomingDaysInMs = UPCOMING_DAYS * 24 * 60 * 60 * 1000;
 var endDate = now + upcomingDaysInMs;
 
-console.log('program.start: ' + program.start)
-console.log('endDate: ' + endDate)
-console.log('startDate: ' + startDate)
 var startDateFormatted = moment(startDate).format('Do MMM');
 var endDateFormatted = moment(endDate).format('Do MMM');
 
+console.log('program.start: ' + program.start);
+console.log('startDate: ' + startDateFormatted);
+console.log('endDate: ' + endDateFormatted);
+
 getYAML.then(function(data){
-	if (data){
-		// console.log(data);
-		Object.keys(data).forEach(function(key){
-			data[key].forEach(function(meetup){
-				if(meetup.url.indexOf('meetup.com') > -1){
-					meetupUrls.push(meetup.url);
+
+	if (data && data.locations){
+		console.log('There are ' + data.locations.length + ' geographic locations');
+		data.locations.forEach(function(geo){
+			console.log('Exploring ' + geo.area + '. Has ' + geo.groups.length + ' groups...');
+
+			geo.groups.forEach(function(group){
+				console.log('Reading ' + group.location + ' Meetup');
+
+				if(group.url.indexOf('meetup.com') > -1){
+					meetupUrls.push(group.url);
 				}
 			});
 		});
@@ -109,45 +118,55 @@ getYAML.then(function(data){
 
 		console.log('fetching events for ' + meetupUrls.length + ' meetups between ' + startDateFormatted + ' - ' + endDateFormatted + ': \n'); //+ meetupUrls.join('\n'));
 
+		var debounced_getEvents = _.debounce(meetupAPI.getEvents, 1000);
+		var increment = 3000;
+		var delay = 0;
 		meetupUrls.forEach(function(url){
 			url = url.replace('http://www.meetup.com/', '').replace('/', '');
 
 			var promise = new RSVP.Promise(function(resolve, reject){
-
-				meetupAPI.getEvents({'group_urlname': url, 'status': 'upcoming'}, function(err, events) {
+				setTimeout(function(){
+					meetupAPI.getEvents({'group_urlname': url, 'status': 'upcoming'}, function(err, events) {
 					// console.log(url + ': searching...');
 
-					if ( !err && events.results){
-						console.log('Found a total of ' + events.results.length + ' events for ' + url);
+						if ( !err && events.results){
+							console.log('Found a total of ' + events.results.length + ' events for ' + url);
 
-						events.results.forEach(function(event){
-							var eventDate = event.time + event.utc_offset + (5*60*60*1000);
-							var timeUntilEvent = eventDate - startDate;
-							var isWithinTimeframe = timeUntilEvent < upcomingDaysInMs && timeUntilEvent > 0;
+							events.results.forEach(function(event){
+								//FIXME: URGH - hacky, when the clocks change this breaks :|
+								var eventDate = event.time + event.utc_offset + TIMEZONE_OFFSET;
+								var timeUntilEvent = eventDate - startDate;
+								var isWithinTimeframe = timeUntilEvent < upcomingDaysInMs && timeUntilEvent > 0;
 
-							var eventObj = {
-								name: event.name,
-								venue: event.venue && event.venue.name ? event.venue.name : '',
-								city: event.venue && event.venue.city ? event.venue.city : '',
-								country: event.venue && event.venue.country ? event.venue.country : '',
-								date: moment(eventDate).format(DATE_FORMAT),
-								url: event.event_url,
-								group: event.group && event.group.name ? event.group.name : ''
-							};
+								var eventObj = {
+									name: event.name,
+									venue: event.venue && event.venue.name ? event.venue.name : '',
+									city: event.venue && event.venue.city ? event.venue.city : '',
+									country: event.venue && event.venue.country ? event.venue.country : '',
+									date: moment(eventDate).format(DATE_FORMAT),
+									url: event.event_url,
+									group: event.group && event.group.name ? event.group.name : ''
+								};
 
-							
 
-							if (isWithinTimeframe){
-								upcomingEvents.push(eventObj);
-							}else{
-								// console.log(eventObj.group + ': ' + eventObj.name + ' will be on ' + eventObj.time);
-							}
-						});
-					}
-					resolve();
-				});
-			
+
+								if (isWithinTimeframe){
+									upcomingEvents.push(eventObj);
+								}else{
+									// console.log(eventObj.group + ': ' + eventObj.name + ' will be on ' + eventObj.time);
+								}
+							});
+						}else{
+							console.error('Uh oh! ', events);
+							reject(events);
+						}
+						resolve();
+					});
+
+				}, delay);
+
 			});
+			delay = delay + increment;
 			promises.push(promise);
 		});
 
@@ -165,17 +184,19 @@ getYAML.then(function(data){
 			    } else {
 			        console.log('Saved output at ' + filename);
 			    }
-			}); 
+			});
 
 		}, function(error){
-			console.error('error:' + error);
+			console.error('error:', error);
 		});
 
-	}	
+	}
 })
 .fail(function(error){
 	console.error(error);
 });
+
+
 
 
 function sortEvents(events){
@@ -185,17 +206,23 @@ function sortEvents(events){
 function yamlitizeNewsletter(events){
 	var newsletterEvents = [];
 	events.forEach(function(eventObj){
-		var eventDescription = eventObj.name ? eventObj.name + '. ' : '';
-			eventDescription += eventObj.date ? eventObj.date : '';
+		// var eventDescription = eventObj.name ? eventObj.name + '. ' : '';
+		var eventDescription = eventObj.date ? eventObj.date : '';
 			eventDescription += eventObj.venue && eventObj.date ? ' @ ' : '';
 			eventDescription += eventObj.venue ? eventObj.venue + ', ' + eventObj.city : '';
 			eventDescription += '.';
 
+		if (eventObj.group === "Ember-SC"){
+			eventObj.group = "Southern California";
+		}
+
 		newsletterEvents.push({
-			title: eventObj.group,
+			title: eventObj.city ? eventObj.city : eventObj.group,
 			description: eventDescription,
 			link: eventObj.url
 		});
+
+
 	});
 
 	return yaml.safeDump(newsletterEvents, {

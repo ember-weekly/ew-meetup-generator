@@ -1,0 +1,56 @@
+- 
+    title: Boston
+    description: "11th December, 6:30pm @ Brightcove, Boston."
+    link: "http://www.meetup.com/Boston-Ember-js/events/218647077/"
+- 
+    title: Montevideo
+    description: "11th December, 7:30pm @ WyeWorks, Montevideo."
+    link: "http://www.meetup.com/ember-montevideo/events/218706687/"
+- 
+    title: Bangalore
+    description: "13th December, 10:00am @ Artoo IT Solutions Pvt. Ltd.,, Bangalore."
+    link: "http://www.meetup.com/EmberJS-Bangalore/events/218840897/"
+- 
+    title: Saint Louis
+    description: "1st December, 6:00pm @ Second Street, Saint Louis."
+    link: "http://www.meetup.com/STLEmber/events/217630292/"
+- 
+    title: Philadelphia
+    description: "2nd December, 6:30pm @ Benjamin's Desk, Philadelphia."
+    link: "http://www.meetup.com/EmberJS-Philly/events/218637050/"
+- 
+    title: Portland
+    description: "2nd December, 6:30pm @ AppNexus, Inc., Portland."
+    link: "http://www.meetup.com/Ember-PDX/events/216432262/"
+- 
+    title: Vancouver
+    description: "2nd December, 6:30pm @ Code Core, Vancouver."
+    link: "http://www.meetup.com/Vancouver-Ember-js/events/218653144/"
+- 
+    title: Seattle
+    description: "3rd December, 6:30pm @ Wayward Coffeehouse, Seattle."
+    link: "http://www.meetup.com/Ember-js-Seattle-Meetup/events/218466972/"
+- 
+    title: Ottawa
+    description: "3rd December, 6:30pm @ bv02, Ottawa."
+    link: "http://www.meetup.com/Ember-js-Ottawa/events/209849542/"
+- 
+    title: New York
+    description: "3rd December, 7:00pm @ Blue Apron, New York."
+    link: "http://www.meetup.com/EmberJS-NYC/events/218735309/"
+- 
+    title: München
+    description: "3rd December, 7:00pm @ Sapient Nitro, München."
+    link: "http://www.meetup.com/Ember-js-Munich/events/218227222/"
+- 
+    title: Toronto
+    description: "4th December, 6:30pm @ Pharmacy Bar, Toronto."
+    link: "http://www.meetup.com/Toronto-Ember-JS-Meetup/events/218911478/"
+- 
+    title: Vancouver
+    description: "9th December, 6:30pm @ Code Core, Vancouver."
+    link: "http://www.meetup.com/Vancouver-Ember-js/events/218820166/"
+- 
+    title: Atlanta
+    description: "9th December, 7:00pm @ Big Nerd Ranch, Atlanta."
+    link: "http://www.meetup.com/Ember-Atlanta-Meetup/events/218759325/"
