@@ -46,7 +46,7 @@ var meetupAPI = require('meetup-api')(MY_MEETUP_API_KEY);
 var meetupURL = 'https://raw.github.com/emberjs/website/master/data/meetups.yml';
 var localMeetupFile = 'data/meetups.yml';
 var UPCOMING_DAYS = program.days;
-var DATE_FORMAT = 'Do MMMM, h:mma';
+var DATE_FORMAT = 'Do MMMM';
 
 if (program.local){
 	console.info('Reading from local file ', localMeetupFile);
@@ -216,9 +216,14 @@ function yamlitizeNewsletter(events){
 			eventObj.group = "Southern California";
 		}
 
+
+		var title = eventObj.city ? eventObj.city : eventObj.group;
+
+		title += ' - ' + eventObj.date;
+
 		newsletterEvents.push({
-			title: eventObj.city ? eventObj.city : eventObj.group,
-			description: eventDescription,
+			title: title, //eventObj.city ? eventObj.city : eventObj.group,
+			// description: eventDescription,
 			link: eventObj.url
 		});
 

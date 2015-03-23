@@ -1,0 +1,48 @@
+- 
+    title: Vancouver
+    description: "10th March, 4:30pm @ Code Core, Vancouver."
+    link: "http://www.meetup.com/Vancouver-Ember-js/events/dbthqkytfbnb/"
+- 
+    title: Atlanta
+    description: "10th March, 5:00pm @ Big Nerd Ranch, Atlanta."
+    link: "http://www.meetup.com/Ember-Atlanta-Meetup/events/220480176/"
+- 
+    title: New York
+    description: "11th March, 5:00pm @ Movable Ink, New York."
+    link: "http://www.meetup.com/EmberJS-NYC/events/220808222/"
+- 
+    title: Ember Riverside Meetup
+    description: "11th March, 5:00pm."
+    link: "http://www.meetup.com/Ember-Riverside-Meetup/events/220421290/"
+- 
+    title: Ember.js Amsterdam
+    description: "11th March, 5:00pm."
+    link: "http://www.meetup.com/Ember-js-Amsterdam/events/219963212/"
+- 
+    title: San Diego
+    description: "11th March, 5:30pm @ EvoNexus, San Diego."
+    link: "http://www.meetup.com/sandiego-ember/events/220473901/"
+- 
+    title: Philadelphia
+    description: "12th March, 4:30pm @ PromptWorks, Philadelphia."
+    link: "http://www.meetup.com/EmberJS-Philly/events/220580903/"
+- 
+    title: Montevideo
+    description: "12th March, 5:30pm @ WyeWorks, Montevideo."
+    link: "http://www.meetup.com/ember-montevideo/events/220173532/"
+- 
+    title: Ember.js São Paulo
+    description: "14th March, 1:00pm."
+    link: "http://www.meetup.com/ember-sp/events/220503461/"
+- 
+    title: Saint Louis
+    description: "2nd March, 3:00pm @ T-Rex - Lammert Building, Saint Louis."
+    link: "http://www.meetup.com/STLEmber/events/220262611/"
+- 
+    title: Portland
+    description: "2nd March, 5:00pm @ Deschutes Brewery, Portland."
+    link: "http://www.meetup.com/Ember-js-Seattle-Meetup/events/220619971/"
+- 
+    title: Vancouver
+    description: "3rd March, 3:30pm @ Code Core, Vancouver."
+    link: "http://www.meetup.com/Vancouver-Ember-js/events/220770432/"
