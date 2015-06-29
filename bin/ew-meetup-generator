@@ -35,15 +35,26 @@ console.log(' - start %j', program.start);
 
 
 var meetupsYAML;
-var meetupUrls = [];
+
+var meetupUrls = [
+	// Manually include urls for meetups with non-meetup urls in the yaml
+	'http://www.meetup.com/Silicon-Valley-EmberJS-Meetup/',
+	'http://www.meetup.com/ember-columbus/',
+	'http://www.meetup.com/London-Emberjs-User-Group/',
+	'http://www.meetup.com/Triangle-Ember/'
+];
+
+
+var miscUrls = [];
 var envConfFile = 'env';
 
 nconf.file({ file: envConfFile});
 
 var MY_MEETUP_API_KEY = nconf.get('MEETUP_API_KEY');
-var meetupAPI = require('meetup-api')(MY_MEETUP_API_KEY);
+var meetupAPI = require('meetup-api')({
+	key: MY_MEETUP_API_KEY
+});
 
-var meetupURL = 'https://raw.github.com/emberjs/website/master/data/meetups.yml';
 var localMeetupFile = 'data/meetups.yml';
 var UPCOMING_DAYS = program.days;
 var DATE_FORMAT = 'Do MMMM';
@@ -109,6 +120,8 @@ getYAML.then(function(data){
 
 				if(group.url.indexOf('meetup.com') > -1){
 					meetupUrls.push(group.url);
+				}else{
+					miscUrls.push(group.url);
 				}
 			});
 		});
@@ -116,7 +129,9 @@ getYAML.then(function(data){
 		var upcomingEvents =[];
 		var promises = [];
 
+		console.warn('Cannot get Meetup url for the following meetups: ' + miscUrls.join(', '));
 		console.log('fetching events for ' + meetupUrls.length + ' meetups between ' + startDateFormatted + ' - ' + endDateFormatted + ': \n'); //+ meetupUrls.join('\n'));
+
 
 		var debounced_getEvents = _.debounce(meetupAPI.getEvents, 1000);
 		var increment = 3000;
@@ -127,7 +142,7 @@ getYAML.then(function(data){
 			var promise = new RSVP.Promise(function(resolve, reject){
 				setTimeout(function(){
 					meetupAPI.getEvents({'group_urlname': url, 'status': 'upcoming'}, function(err, events) {
-					// console.log(url + ': searching...');
+					// console.log(url + ' || ' + err + ' || ' + events);
 
 						if ( !err && events.results){
 							console.log('Found a total of ' + events.results.length + ' events for ' + url);
@@ -157,8 +172,8 @@ getYAML.then(function(data){
 								}
 							});
 						}else{
-							console.error('Uh oh! ', events);
-							reject(events);
+							console.error('Uh oh! ', err, events);
+							// reject(err, events);
 						}
 						resolve();
 					});
@@ -214,6 +229,10 @@ function yamlitizeNewsletter(events){
 
 		if (eventObj.group === "Ember-SC"){
 			eventObj.group = "Southern California";
+		}
+
+		if (eventObj.group === "ember-columbus" && eventObj.city === "Dublin"){
+			eventObj.city = "Columbus";
 		}
 
 
