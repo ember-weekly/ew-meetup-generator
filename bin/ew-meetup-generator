@@ -36,12 +36,13 @@ console.log(' - start %j', program.start);
 
 var meetupsYAML;
 
+// Manually include urls for meetups with non-meetup urls in the yaml
 var meetupUrls = [
-	// Manually include urls for meetups with non-meetup urls in the yaml
 	'http://www.meetup.com/Silicon-Valley-EmberJS-Meetup/',
-	'http://www.meetup.com/ember-columbus/',
 	'http://www.meetup.com/London-Emberjs-User-Group/',
-	'http://www.meetup.com/Triangle-Ember/'
+	'http://www.meetup.com/Triangle-Ember/',
+    'http://www.meetup.com/embernati/',
+    'http://www.meetup.com/Silicon-Valley-EmberJS-Meetup/'
 ];
 
 
