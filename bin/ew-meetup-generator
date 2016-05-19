@@ -33,7 +33,6 @@ console.log(' - overwrite %j', program.overwrite);
 console.log(' - path %j', program.path);
 console.log(' - start %j', program.start);
 
-
 var meetupsYAML;
 
 // Manually include urls for meetups with non-meetup urls in the yaml
@@ -45,6 +44,11 @@ var meetupUrls = [
     'http://www.meetup.com/Silicon-Valley-EmberJS-Meetup/'
 ];
 
+var eventTitleMap = {
+    "Ember-SC": "Southern California",
+    "Ember Columbus": "Columbus",
+    "Silicon Valley Ember.js Meetup": "Silicon Valley"
+}
 
 var miscUrls = [];
 var envConfFile = 'env';
@@ -228,16 +232,19 @@ function yamlitizeNewsletter(events){
 			eventDescription += eventObj.venue ? eventObj.venue + ', ' + eventObj.city : '';
 			eventDescription += '.';
 
-		if (eventObj.group === "Ember-SC"){
-			eventObj.group = "Southern California";
-		}
+		// if (eventObj.group === "Ember-SC"){
+		// 	eventObj.group = "Southern California";
+		// }
 
-		if (eventObj.group === "ember-columbus" && eventObj.city === "Dublin"){
-			eventObj.city = "Columbus";
-		}
+		// if (eventObj.group === "ember-columbus" && eventObj.city === "Dublin"){
+		// 	eventObj.city = "Columbus";
+		// }
 
-
-		var title = eventObj.city ? eventObj.city : eventObj.group;
+        var title = eventTitleMap[eventObj.group]
+        console.log(eventObj.group + ': ' + title + ' {}');
+        if (!title){
+            title = eventObj.city ? eventObj.city : eventObj.group;
+        }
 
 		title += ' - ' + eventObj.date;
 
