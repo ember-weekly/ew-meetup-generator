@@ -139,7 +139,7 @@ getYAML.then(function(data){
 
 
 		var debounced_getEvents = _.debounce(meetupAPI.getEvents, 1000);
-		var increment = 3000;
+		var increment = 1000;
 		var delay = 0;
 		meetupUrls.forEach(function(url){
 			url = url.replace('http://www.meetup.com/', '').replace('/', '');
