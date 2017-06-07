@@ -138,50 +138,52 @@ getYAML.then(function(data){
 		console.log('fetching events for ' + meetupUrls.length + ' meetups between ' + startDateFormatted + ' - ' + endDateFormatted + ': \n'); //+ meetupUrls.join('\n'));
 
 
-		var debounced_getEvents = _.debounce(meetupAPI.getEvents, 1000);
-		var increment = 1000;
+		// var debounced_getEvents = _.debounce(meetupAPI.getEvents, 1000);
+		var increment = 500;
 		var delay = 0;
 		meetupUrls.forEach(function(url){
 			url = url.replace('http://www.meetup.com/', '').replace('/', '');
 
 			var promise = new RSVP.Promise(function(resolve, reject){
 				setTimeout(function(){
-					meetupAPI.getEvents({'group_urlname': url, 'status': 'upcoming'}, function(err, events) {
-					// console.log(url + ' || ' + err + ' || ' + events);
+					try {
+						meetupAPI.getEvents({'group_urlname': url, 'status': 'upcoming', fields: 'timezone'}, function(err, events) {
+						// console.log(url + ' || ' + err + ' || ' + events);
 
-						if ( !err && events.results){
-							console.log('Found a total of ' + events.results.length + ' events for ' + url);
+							if ( !err && events.results){
+								console.log('Found a total of ' + events.results.length + ' events for ' + url);
 
-							events.results.forEach(function(event){
-								//FIXME: URGH - hacky, when the clocks change this breaks :|
-								var eventDate = event.time + event.utc_offset + TIMEZONE_OFFSET;
-								var timeUntilEvent = eventDate - startDate;
-								var isWithinTimeframe = timeUntilEvent < upcomingDaysInMs && timeUntilEvent > 0;
+								events.results.forEach(function(event){
+									var eventDate = event.time + event.utc_offset;
+									var timeUntilEvent = eventDate - startDate;
+									var isWithinTimeframe = timeUntilEvent < upcomingDaysInMs && timeUntilEvent > 0;
 
-								var eventObj = {
-									name: event.name,
-									venue: event.venue && event.venue.name ? event.venue.name : '',
-									city: event.venue && event.venue.city ? event.venue.city : '',
-									country: event.venue && event.venue.country ? event.venue.country : '',
-									date: moment(eventDate).format(DATE_FORMAT),
-									url: event.event_url,
-									group: event.group && event.group.name ? event.group.name : ''
-								};
-
+									var eventObj = {
+										name: event.name,
+										venue: event.venue && event.venue.name ? event.venue.name : '',
+										city: event.venue && event.venue.city ? event.venue.city : '',
+										country: event.venue && event.venue.country ? event.venue.country : '',
+										date: moment(eventDate).format(DATE_FORMAT),
+										url: event.event_url,
+										group: event.group && event.group.name ? event.group.name : ''
+									};
 
 
-								if (isWithinTimeframe){
-									upcomingEvents.push(eventObj);
-								}else{
-									// console.log(eventObj.group + ': ' + eventObj.name + ' will be on ' + eventObj.time);
-								}
-							});
-						}else{
-							console.error('Uh oh! ', err, events);
-							// reject(err, events);
-						}
-						resolve();
-					});
+									if (isWithinTimeframe){
+										upcomingEvents.push(eventObj);
+									}else{
+										// console.log(eventObj.group + ': ' + eventObj.name + ' will be on ' + eventObj.time);
+									}
+								});
+							}else{
+								console.error('Uh oh! ', err, events);
+								// reject(err, events);
+							}
+							resolve();
+						});
+					} catch (exeption) {
+						console.error('Uh oh! ', exeption);
+					}
 
 				}, delay);
 

@@ -21,16 +21,16 @@
   "license": "MIT",
   "bugs": "https://github.com///ew-meetup-generator/issues",
   "dependencies": {
-    "commander": "~2.8.1",
     "autocmdr": "~0.0.4",
+    "commander": "~2.8.1",
     "js-yaml": "~3.0.1",
-    "meetup-api": "~0.1.25",
+    "lodash": "~2.4.1",
+    "meetup-api": "^1.4.10",
     "moment": "~2.5.0",
-    "rsvp": "~2.0.4",
-    "request": "~2.30.0",
-    "underscore.string": "~2.3.3",
     "nconf": "~0.6.9",
-    "lodash": "~2.4.1"
+    "request": "~2.30.0",
+    "rsvp": "~2.0.4",
+    "underscore.string": "~2.3.3"
   },
   "devDependencies": {}
 }
