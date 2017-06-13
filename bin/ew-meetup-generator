@@ -14,8 +14,8 @@ var program  = require('commander'),
 	_ = require('lodash'),
 	nconf = require('nconf');
 
-//FIXME: URGH - hacky, when the clocks change (or it runs from different timezone) this breaks :|
-var TIMEZONE_OFFSET = 5 * (60*60*1000); // hrs * mins * sec * ms
+var now = new Date();
+var TIMEZONE_OFFSET = now.getTimezoneOffset() / 60;
 
 var GITHUB_MEETUP_YAML = 'https://raw.github.com/emberjs/website/master/data/meetups.yml';
 
@@ -122,10 +122,14 @@ getYAML.then(function(data){
 
 			geo.groups.forEach(function(group){
 				console.log('Reading ' + group.location + ' Meetup');
-
-				if(group.url.indexOf('meetup.com') > -1){
-					meetupUrls.push(group.url);
-				}else{
+				
+				
+				if (group.url.indexOf('meetup.com') > -1 ){
+					var alreadyPopulated = meetupUrls.indexOf(group.url) > -1;
+					if (!alreadyPopulated) {
+						meetupUrls.push(group.url);
+					}
+				} else {
 					miscUrls.push(group.url);
 				}
 			});
@@ -141,6 +145,7 @@ getYAML.then(function(data){
 		// var debounced_getEvents = _.debounce(meetupAPI.getEvents, 1000);
 		var increment = 500;
 		var delay = 0;
+		console.log(meetupUrls.join('\n'));
 		meetupUrls.forEach(function(url){
 			url = url.replace('http://www.meetup.com/', '').replace('/', '');
 
